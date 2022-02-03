@@ -6,7 +6,7 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/26 16:40:28 by tmongell          #+#    #+#             */
-/*   Updated: 2022/01/26 16:44:50 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/02/03 19:53:01 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,14 @@ char	*ft_strdup(const char *s1)
 size_t	ft_strlen(const char *s)
 {
 	int	i;
-
+	
+	if (!s)
+		return (0);
 	i = 0;
 	while (s[i])
+	{
 		i ++;
-	return (i);
+	}	return (i);
 }
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)

@@ -6,11 +6,14 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 04:07:17 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/01 17:22:06 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/02/04 00:29:33 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>//============================================================DEBUG
+#include <string.h>//===========================================================DEBUG
+#define BUFFER_SIZE 42//========================================================DEBUG
 
 char	*get_next_line(int fd)
 {
@@ -22,7 +25,7 @@ char	*get_next_line(int fd)
 		return (NULL);
 	buf[BUFFER_SIZE] = '\0';
 	line = ft_strdup(leftover);
-	if (got_end_of_line(line))
+	if (multiple_line_in_str(leftover))
 	{
 		leftover = save_leftover(line);
 		return (line);
@@ -38,6 +41,8 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
+//used on the buf. test if the str get either a /n or /0 in it, which would mean
+//the line is over
 int	got_end_of_line(char *str)
 {
 	int	i;
@@ -46,6 +51,24 @@ int	got_end_of_line(char *str)
 	while (i < BUFFER_SIZE)
 	{
 		if (str[i] == '\n' || str[i] == '\0')
+			return (1);
+		i ++;
+	}
+	return (0);
+}
+
+//used on the leftover, to see if we should read anything. differ from
+//got_end_of_line by the fact it does not see \0 as end of line.
+int	multiple_line_in_str(char *str)
+{
+	int	i;
+
+	if (!str)
+		return (0);
+	i = 0;
+	while(str[i])
+	{
+		if (str[i] == '\n')
 			return (1);
 		i ++;
 	}
@@ -85,5 +108,10 @@ char	*save_leftover(char *str)
 		return (ft_strdup(""));
 	str[i ++] = '\0';
 	leftover = ft_strdup(str + i);
+	if (!*leftover)
+	{
+		free(leftover);
+		leftover = NULL;
+	}
 	return (leftover);
 }
