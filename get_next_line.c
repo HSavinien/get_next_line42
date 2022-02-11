@@ -6,7 +6,7 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 04:07:17 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/09 18:48:57 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/02/11 01:36:43 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,12 @@ char	*get_next_line(int fd)
 		free(line);
 		return (NULL);
 	}
-	while (!got_end_of_line(buf))
+	while (!got_end_of_line(buf) && read_ret > 0)
 	{
-		line = save_buf(line, buf);
-		read(fd, buf, BUFFER_SIZE);
+		line = save_buf(line, buf, read_ret);
+		read_ret = read(fd, buf, BUFFER_SIZE);
 	}
-	line = save_buf(line, buf);
+	line = save_buf(line, buf, read_ret);
 	leftover = save_leftover(buf, leftover);
 	return (line);
 }
@@ -83,7 +83,7 @@ int	multiple_line_in_str(char *str)
 	return (0);
 }
 
-char	*save_buf(char *base_str, char *buf)
+char	*save_buf(char *base_str, char *buf, int read_ret)
 {
 	char	*new_str;
 	int		base_size;
@@ -91,7 +91,7 @@ char	*save_buf(char *base_str, char *buf)
 
 	base_size = ft_strlen(base_str);
 	buf_size = 0;
-	while (buf[buf_size] && buf[buf_size] != '\n')
+	while (buf[buf_size] && buf[buf_size] != '\n' && read_ret-- )
 		buf_size ++;
 	if (buf[buf_size] == '\n')
 		buf_size ++;
