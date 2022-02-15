@@ -6,7 +6,7 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 04:07:17 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/15 10:35:58 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/02/15 12:16:29 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ char	*get_next_line(int fd)
 	line = ft_strdup(leftover);
 	if (multiple_line_in_str(leftover))
 	{
-		leftover = save_leftover(line, leftover, BUFFER_SIZE);
+		leftover = save_lftover(line, leftover, BUFFER_SIZE, ft_strlen(line));
 		return (line);
 	}
 	buf[BUFFER_SIZE] = '\0';
@@ -37,8 +37,6 @@ char	*get_next_line(int fd)
 	if (read_ret <= 0 && !ft_strlen(leftover))
 	{
 		free(line);
-		free(leftover);
-		leftover = NULL;
 		return (NULL);
 	}
 	while (!got_end_of_line(buf) && read_ret > 0)
@@ -47,7 +45,7 @@ char	*get_next_line(int fd)
 		read_ret = read(fd, buf, BUFFER_SIZE);
 	}
 	line = save_buf(line, buf, read_ret);
-	leftover = save_leftover(buf, leftover, read_ret);
+	leftover = save_lftover(buf, leftover, read_ret, ft_strlen(line));
 	return (line);
 }
 
@@ -106,7 +104,7 @@ char	*save_buf(char *base_str, char *buf, int read_ret)
 	return (new_str);
 }
 
-char	*save_leftover(char *str, char *old_leftover, int read_ret)
+char	*save_lftover(char *str, char *old_lftover, int read_ret, int line_len)
 {
 	char	*leftover;
 	int		i;
@@ -114,10 +112,10 @@ char	*save_leftover(char *str, char *old_leftover, int read_ret)
 	i = 0;
 	while (str[i] != '\0' && str[i] != '\n')
 		i++;
-	if (!str[i] || read_ret < BUFFER_SIZE)
+	if (!str[i] || (read_ret < BUFFER_SIZE && line_len >= BUFFER_SIZE))
 	{
-		if (old_leftover)
-			free(old_leftover);
+		if (old_lftover)
+			free(old_lftover);
 		return (NULL);
 	}
 	leftover = ft_strdup(str + i + 1);
@@ -127,7 +125,7 @@ char	*save_leftover(char *str, char *old_leftover, int read_ret)
 		free(leftover);
 		leftover = NULL;
 	}
-	if (old_leftover)
-		free(old_leftover);
+	if (old_lftover)
+		free(old_lftover);
 	return (leftover);
 }

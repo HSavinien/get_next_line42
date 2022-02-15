@@ -6,7 +6,7 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 04:08:59 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/15 10:34:27 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/02/15 12:15:20 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 //functions from get_next_line.c
 char	*get_next_line(int fd);
 char	*save_buf(char *base_str, char *buf, int read_ret);
-char	*save_leftover(char *str, char *old_leftover, int read_ret);
+char	*save_lftover(char *str, char *old_lftover, int read_ret, int line_len);
 int		got_end_of_line(char *str);
 int		multiple_line_in_str(char	*str);
 //functions from get_next_line_utils.c
