@@ -6,7 +6,7 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 04:07:17 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/11 01:36:43 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/02/15 10:35:58 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,16 @@ char	*get_next_line(int fd)
 	line = ft_strdup(leftover);
 	if (multiple_line_in_str(leftover))
 	{
-		leftover = save_leftover(line, leftover);
+		leftover = save_leftover(line, leftover, BUFFER_SIZE);
 		return (line);
 	}
 	buf[BUFFER_SIZE] = '\0';
 	read_ret = read(fd, buf, BUFFER_SIZE);
-	if (read_ret <= 0)
+	if (read_ret <= 0 && !ft_strlen(leftover))
 	{
 		free(line);
+		free(leftover);
+		leftover = NULL;
 		return (NULL);
 	}
 	while (!got_end_of_line(buf) && read_ret > 0)
@@ -45,7 +47,7 @@ char	*get_next_line(int fd)
 		read_ret = read(fd, buf, BUFFER_SIZE);
 	}
 	line = save_buf(line, buf, read_ret);
-	leftover = save_leftover(buf, leftover);
+	leftover = save_leftover(buf, leftover, read_ret);
 	return (line);
 }
 
@@ -104,17 +106,20 @@ char	*save_buf(char *base_str, char *buf, int read_ret)
 	return (new_str);
 }
 
-char	*save_leftover(char *str, char *old_leftover)
+char	*save_leftover(char *str, char *old_leftover, int read_ret)
 {
 	char	*leftover;
 	int		i;
-	(void)	old_leftover;
 
 	i = 0;
 	while (str[i] != '\0' && str[i] != '\n')
 		i++;
-	if (!str[i])
+	if (!str[i] || read_ret < BUFFER_SIZE)
+	{
+		if (old_leftover)
+			free(old_leftover);
 		return (NULL);
+	}
 	leftover = ft_strdup(str + i + 1);
 	str[i + 1] = '\0';
 	if (!*leftover)
