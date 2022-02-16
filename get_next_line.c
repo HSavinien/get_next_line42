@@ -6,7 +6,7 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 04:07:17 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/15 12:16:29 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/02/15 16:04:13 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ char	*get_next_line(int fd)
 	while (!got_end_of_line(buf) && read_ret > 0)
 	{
 		line = save_buf(line, buf, read_ret);
+		memset(buf, '\0', BUFFER_SIZE);
 		read_ret = read(fd, buf, BUFFER_SIZE);
 	}
 	line = save_buf(line, buf, read_ret);
@@ -108,11 +109,13 @@ char	*save_lftover(char *str, char *old_lftover, int read_ret, int line_len)
 {
 	char	*leftover;
 	int		i;
+	(void)	line_len;
+	(void)	read_ret;
 
 	i = 0;
 	while (str[i] != '\0' && str[i] != '\n')
 		i++;
-	if (!str[i] || (read_ret < BUFFER_SIZE && line_len >= BUFFER_SIZE))
+	if (!str[i])
 	{
 		if (old_lftover)
 			free(old_lftover);
