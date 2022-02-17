@@ -1,35 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/25 04:07:17 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/17 05:15:37 by tmongell         ###   ########.fr       */
+/*   Created: 2022/02/17 04:17:03 by tmongell          #+#    #+#             */
+/*   Updated: 2022/02/17 05:15:27 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
+#define MAX_FD 255
 
 char	*get_next_line(int fd)
 {
 	char		buf[BUFFER_SIZE + 1];
 	char		*line;
-	static char	*leftover;
+	static char	*leftover[MAX_FD + 1];
 	int			read_ret;
 
-	if (fd < 0 || BUFFER_SIZE < 1)
+	if (fd < 0 || BUFFER_SIZE < 1 || fd > MAX_FD)
 		return (NULL);
-	line = ft_strdup(leftover);
-	if (got_end_of_line(leftover))
+	line = ft_strdup(leftover[fd]);
+	if (got_end_of_line(leftover[fd]))
 	{
-		leftover = save_leftover(line, leftover);
+		leftover[fd] = save_leftover(line, leftover[fd]);
 		return (line);
 	}
 	buf[BUFFER_SIZE] = '\0';
 	read_ret = read(fd, buf, BUFFER_SIZE);
-	if (read_ret <= 0 && !ft_strlen(leftover))
+	if (read_ret <= 0 && !ft_strlen(leftover[fd]))
 		return (do_free(line));
 	while (!got_end_of_line(buf) && read_ret == BUFFER_SIZE)
 	{
@@ -37,7 +38,7 @@ char	*get_next_line(int fd)
 		ft_memset(buf, '\0', BUFFER_SIZE);
 		read_ret = read(fd, buf, BUFFER_SIZE);
 	}
-	leftover = save_leftover(buf, leftover);
+	leftover[fd] = save_leftover(buf, leftover[fd]);
 	return (save_buf(line, buf, read_ret));
 }
 
