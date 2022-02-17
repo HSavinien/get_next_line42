@@ -6,7 +6,7 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/26 16:40:28 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/09 18:44:52 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/02/17 03:16:30 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,4 +53,21 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 	}
 	dst[i - 1] = '\0';
 	return ((size_t)ft_strlen(src));
+}
+
+void	*ft_memset(void *b, int c, size_t len)
+{
+	size_t			i;
+	unsigned char	*str;
+
+	if (!b)
+		return (NULL);
+	i = 0;
+	str = b;
+	while (i < len)
+	{
+		str[i] = c;
+		i ++;
+	}
+	return (str);
 }

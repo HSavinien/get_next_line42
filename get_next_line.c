@@ -6,13 +6,11 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 04:07:17 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/15 16:04:13 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/02/17 04:06:29 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>//============================================================DEBUG
-#include <string.h>//===========================================================DEBUG
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 42
 #endif
@@ -27,55 +25,39 @@ char	*get_next_line(int fd)
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
 	line = ft_strdup(leftover);
-	if (multiple_line_in_str(leftover))
+	if (got_end_of_line(leftover))
 	{
-		leftover = save_lftover(line, leftover, BUFFER_SIZE, ft_strlen(line));
+		leftover = save_leftover(line, leftover);
 		return (line);
 	}
 	buf[BUFFER_SIZE] = '\0';
 	read_ret = read(fd, buf, BUFFER_SIZE);
 	if (read_ret <= 0 && !ft_strlen(leftover))
-	{
-		free(line);
-		return (NULL);
-	}
-	while (!got_end_of_line(buf) && read_ret > 0)
+		return (do_free(line));
+	while (!got_end_of_line(buf) && read_ret == BUFFER_SIZE)
 	{
 		line = save_buf(line, buf, read_ret);
-		memset(buf, '\0', BUFFER_SIZE);
+		ft_memset(buf, '\0', BUFFER_SIZE);
 		read_ret = read(fd, buf, BUFFER_SIZE);
 	}
-	line = save_buf(line, buf, read_ret);
-	leftover = save_lftover(buf, leftover, read_ret, ft_strlen(line));
-	return (line);
+	leftover = save_leftover(buf, leftover);
+	return (save_buf(line, buf, read_ret));
 }
 
-//used on the buf. test if the str get either a /n or /0 in it, which would mean
-//the line is over
-int	got_end_of_line(char *str)
+void	*do_free(void *ptr)
 {
-	int	i;
-
-	i = 0;
-	while (i < BUFFER_SIZE)
-	{
-		if (str[i] == '\n' || str[i] == '\0')
-			return (1);
-		i ++;
-	}
-	return (0);
+	free(ptr);
+	return (NULL);
 }
 
-//used on the leftover, to see if we should read anything. differ from
-//got_end_of_line by the fact it does not see \0 as end of line.
-int	multiple_line_in_str(char *str)
+int	got_end_of_line(char *str)
 {
 	int	i;
 
 	if (!str)
 		return (0);
 	i = 0;
-	while (str[i])
+	while (i < BUFFER_SIZE)
 	{
 		if (str[i] == '\n')
 			return (1);
@@ -92,7 +74,7 @@ char	*save_buf(char *base_str, char *buf, int read_ret)
 
 	base_size = ft_strlen(base_str);
 	buf_size = 0;
-	while (buf[buf_size] && buf[buf_size] != '\n' && read_ret-- )
+	while (buf[buf_size] && buf[buf_size] != '\n' && read_ret--)
 		buf_size ++;
 	if (buf[buf_size] == '\n')
 		buf_size ++;
@@ -105,20 +87,18 @@ char	*save_buf(char *base_str, char *buf, int read_ret)
 	return (new_str);
 }
 
-char	*save_lftover(char *str, char *old_lftover, int read_ret, int line_len)
+char	*save_leftover(char *str, char *old_leftover)
 {
 	char	*leftover;
 	int		i;
-	(void)	line_len;
-	(void)	read_ret;
 
 	i = 0;
 	while (str[i] != '\0' && str[i] != '\n')
 		i++;
 	if (!str[i])
 	{
-		if (old_lftover)
-			free(old_lftover);
+		if (old_leftover)
+			free(old_leftover);
 		return (NULL);
 	}
 	leftover = ft_strdup(str + i + 1);
@@ -128,7 +108,7 @@ char	*save_lftover(char *str, char *old_lftover, int read_ret, int line_len)
 		free(leftover);
 		leftover = NULL;
 	}
-	if (old_lftover)
-		free(old_lftover);
+	if (old_leftover)
+		free(old_leftover);
 	return (leftover);
 }
