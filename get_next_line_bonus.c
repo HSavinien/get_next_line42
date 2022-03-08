@@ -6,7 +6,7 @@
 /*   By: tmongell <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 04:17:03 by tmongell          #+#    #+#             */
-/*   Updated: 2022/02/17 05:15:27 by tmongell         ###   ########.fr       */
+/*   Updated: 2022/03/08 08:52:17 by tmongell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	*get_next_line(int fd)
 		leftover[fd] = save_leftover(line, leftover[fd]);
 		return (line);
 	}
-	buf[BUFFER_SIZE] = '\0';
+	ft_memset(buf, 0, BUFFER_SIZE + 1);
 	read_ret = read(fd, buf, BUFFER_SIZE);
 	if (read_ret <= 0 && !ft_strlen(leftover[fd]))
 		return (do_free(line));
@@ -55,7 +55,7 @@ int	got_end_of_line(char *str)
 	if (!str)
 		return (0);
 	i = 0;
-	while (i < BUFFER_SIZE)
+	while (str[i])
 	{
 		if (str[i] == '\n')
 			return (1);
@@ -90,15 +90,13 @@ char	*save_leftover(char *str, char *old_leftover)
 	char	*leftover;
 	int		i;
 
+	if (old_leftover)
+		free(old_leftover);
 	i = 0;
 	while (str[i] != '\0' && str[i] != '\n')
 		i++;
 	if (!str[i])
-	{
-		if (old_leftover)
-			free(old_leftover);
 		return (NULL);
-	}
 	leftover = ft_strdup(str + i + 1);
 	str[i + 1] = '\0';
 	if (!*leftover)
@@ -106,7 +104,5 @@ char	*save_leftover(char *str, char *old_leftover)
 		free(leftover);
 		leftover = NULL;
 	}
-	if (old_leftover)
-		free(old_leftover);
 	return (leftover);
 }
